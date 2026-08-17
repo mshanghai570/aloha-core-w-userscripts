@@ -1,0 +1,4 @@
+# Userscript support - internal
+# This imports the userscript build definitions from the parent ios/web_view
+# directory. Adjust the import path if you prefer a different layout.
+import("../BUILD.userscripts.gn")
