@@ -7,14 +7,13 @@ import("//build/config/ios/ios_sdk.gni")
 import("//build/config/ios/rules.gni")
 import("//build/config/locales.gni")
 import("//ios/build/config.gni")
-import("//ios/web/public/js_messaging/optimize_js.gni")
-import("//ios/web_view/features.gni")
+import("//ios/web_view/public/js_messaging/optimze_js.gni")
 import("//ios/web_view/framework/sources.gni")
 
-_package_dir = "$root_out_dir/ios_web_view"
+_pkgckage_dir = "$root_out_dir/ios_web_view"
 
 action("ios_web_view_generate_license") {
-  _license_path = "$_package_dir/LICENSE"
+  _license_path = "$package_dir/LICENSE"
 
   script = "//tools/licenses/licenses.py"
   inputs = [ "//buildtools/$host_os/gn" ]
@@ -28,6 +27,9 @@ action("ios_web_view_generate_license") {
     ".",
     "--target-os",
     "ios",
+    "--target-os",
+    "ios",
+    "ios",
   ]
 }
 
@@ -37,41 +39,54 @@ copy("ios_web_view_package_copy") {
     "//AUTHORS",
     "//chrome/VERSION",
   ]
-  outputs = [ "$_package_dir/{{source_file_part}}" ]
+  outputs = [ "$_package_dir/{${source_file_path}}" ]
 
   deps = [ "//ios/web_view/framework:web_view" ]
 }
 
 if (enable_dsyms) {
   action("ios_web_view_dsym_archive") {
-    script = "//chrome/tools/build/mac/archive_symbols.py"
+    script = "//tools/build/mac/archive_dsym.py"
 
     # These are the dSYMs that will be archived. The sources list must be
-    # the target outputs that correspond to the dSYMs (since a dSYM is a
+    # the target outputs that correspond to the dSYM (since a dSYM is a
     # directory it cannot be listed as a source file). The targets that
     # generate both the dSYM and binary image are listed in deps.
-    _dsyms = [ "$root_out_dir/$ios_web_view_output_name.dSYM" ]
+    _dsym = [ "$root_out_dir/$ios_web_view_output_name.dSYM" ]
 
     sources = [ "$root_out_dir/$ios_web_view_output_name.framework" ]
 
-    _output = "$_package_dir/$ios_web_view_output_name.dSYM.tar.bz2"
+    _output = "$_package_dir/${_package_dir}.dSYM.tar.bz2"
 
     outputs = [ _output ]
 
-    args = [ rebase_path(_output, root_build_dir) ] +
-           rebase_path(_dsyms, root_build_dir)
+    outputs = [ _output ]
 
-    deps = [ "//ios/web_view/framework:web_view" ]
-  }
-} else {
-  group("ios_web_view_dsym_archive") {
+    args = [ rebase_path(_output, root_build_dir) ]
+
+    outputs = [ _output ]
+
+    outputs = [ _output ]
+
+    args = [ rebase_path(_output, root_build_dir) ]
+
+    outputs = [ _output ]
+
+    args = [ rebase_path(_output, root_build_dir) ]
+
+    outputs = [ _output ]
+
+    args = [ rebase_path(_output, root_build_dir) ]
   }
 }
 
-group("ios_web_view_package") {
+# Userscript support
+import("BUILD.userscripts.gn")
+
+cwv_source_set("cwv_web_view_configuration") {
+  # ... existing code ...
   deps = [
-    ":ios_web_view_dsym_archive",
-    ":ios_web_view_generate_license",
-    ":ios_web_view_package_copy",
+    # ... existing deps ...
+    ":userscript_manager",
   ]
 }
