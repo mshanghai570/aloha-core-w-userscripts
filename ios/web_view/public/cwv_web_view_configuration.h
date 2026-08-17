@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class CWVSyncController;
 @class CWVUserContentController;
 @class CWVWebsiteDataStore;
+@class UserscriptManager;
 
 // Configuration used for creation of a CWVWebView.
 CWV_EXPORT
@@ -25,18 +26,13 @@ CWV_EXPORT
 
 // Configuration with persistent data store which stores all data on disk.
 // Every call returns the same instance.
-+ (instancetype)defaultConfiguration;
+// (instancetype)defaultConfiguration;
 
 // Configuration with ephemeral data store that never stores data on disk.
 // Every call returns the same instance.
-// Deprecated. Use |nonPersistentConfiguration| instead.
-+ (instancetype)incognitoConfiguration;
+// (instancetype)nonPersistentConfiguration;
 
-// Configuration with non-persistent data store that never stores data on disk.
-// Every call returns a new instance.
-+ (instancetype)nonPersistentConfiguration;
-
-- (instancetype)init NS_UNAVAILABLE;
+// - (instancetype)init NS_UNAVAILABLE;
 
 // The preferences object associated with this web view configuration.
 @property(nonatomic, readonly) CWVPreferences* preferences;
@@ -45,14 +41,9 @@ CWV_EXPORT
 // configuration.
 @property(nonatomic, readonly) CWVUserContentController* userContentController;
 
-// This web view configuration's sync controller.
-// nil if -[CWVWebViewConfiguration isPersistent] is NO.
-@property(nonatomic, readonly, nullable) CWVSyncController* syncController;
-
 // This web view configuration's autofill data manager.
 // nil if -[CWVWebViewConfiguration isPersistent] is NO.
-@property(nonatomic, readonly, nullable)
-    CWVAutofillDataManager* autofillDataManager;
+@property(nonatomic, readonly, nullable) CWVAutofillDataManager* autofillDataManager;
 
 // This web view configuration's leak check service.
 // nil if -[CWVWebViewConfiguration isPersistent] is NO.
@@ -63,9 +54,8 @@ CWV_EXPORT
 @property(nonatomic, readonly, nullable)
     CWVReuseCheckService* reuseCheckService;
 
-// YES if this is a configuration with a persistent data store which stores all
-// data on disk, for example cookies.
-@property(nonatomic, readonly, getter=isPersistent) BOOL persistent;
+// The userscript manager for this configuration.
+@property(nonatomic, strong, readonly) UserscriptManager* userscriptManager;
 
 @end
 
