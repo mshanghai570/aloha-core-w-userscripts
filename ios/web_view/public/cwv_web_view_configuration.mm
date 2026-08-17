@@ -49,4 +49,9 @@
   return self;
 }
 
+- (NSURL*)_userscriptsStorageDirectory {
+  NSURL* browserStateDir = [NSURL fileURLWithPath:_browserState->GetStatePath().path];
+  return [browserStateDir URLByAppendingPathComponent:@"Userscripts"];
+}
+
 @end
