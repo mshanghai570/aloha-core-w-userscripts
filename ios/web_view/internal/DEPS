@@ -78,6 +78,7 @@ include_rules = [
   "+third_party/ocmock",
   "+ui/base",
   "+ui/gfx",
+  "+url",
   # keep-sorted end
 ]
 

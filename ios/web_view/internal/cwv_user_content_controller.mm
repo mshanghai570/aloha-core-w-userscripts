@@ -58,6 +58,11 @@ NSDictionary* NSDictionaryFromDictValue(const base::DictValue& value) {
   [self updatePageScripts];
 }
 
+- (void)removeUserScript:(nonnull CWVUserScript*)userScript {
+  [_userScripts removeObjectIdenticalTo:userScript];
+  [self updatePageScripts];
+}
+
 - (void)removeAllUserScripts {
   [_userScripts removeAllObjects];
   [self updatePageScripts];

@@ -5,6 +5,7 @@
 #import <memory>
 
 #import "base/check_op.h"
+#import "base/strings/sys_string_conversions.h"
 #import "base/threading/thread_restrictions.h"
 #import "components/affiliations/core/browser/affiliation_service.h"
 #import "components/keyed_service/core/service_access_type.h"
@@ -31,6 +32,7 @@
 #import "ios/web_view/internal/sync/cwv_sync_controller_internal.h"
 #import "ios/web_view/internal/sync/web_view_sync_service_factory.h"
 #import "ios/web_view/internal/web_view_browser_state.h"
+#import "ios/web_view/public/cwv_userscript_manager.h"
 
 namespace {
 CWVWebViewConfiguration* gDefaultConfiguration = nil;
@@ -44,6 +46,9 @@ NSHashTable<CWVWebViewConfiguration*>* gNonPersistentConfigurations = nil;
 
   // Holds all CWVWebViews created with this class. Weak references.
   NSHashTable* _webViews;
+
+  // Loads local userscripts and registers them with the content controller.
+  CWVUserscriptManager* _userscriptManager;
 }
 
 @end
@@ -56,6 +61,7 @@ NSHashTable<CWVWebViewConfiguration*>* gNonPersistentConfigurations = nil;
 @synthesize preferences = _preferences;
 @synthesize syncController = _syncController;
 @synthesize userContentController = _userContentController;
+@synthesize userscriptManager = _userscriptManager;
 
 + (void)initialize {
   if (self != [CWVWebViewConfiguration class]) {
@@ -132,6 +138,15 @@ NSHashTable<CWVWebViewConfiguration*>* gNonPersistentConfigurations = nil;
 
     _userContentController =
         [[CWVUserContentController alloc] initWithConfiguration:self];
+
+    NSURL* browserStateURL = [NSURL
+        fileURLWithPath:base::SysUTF8ToNSString(_browserState->GetStatePath().value())
+             isDirectory:YES];
+    _userscriptManager = [[CWVUserscriptManager alloc]
+        initWithStorageDirectory:[browserStateURL
+                                     URLByAppendingPathComponent:@"Userscripts"
+                                                      isDirectory:YES]
+             userContentController:_userContentController];
 
     _webViews = [NSHashTable weakObjectsHashTable];
   }

@@ -80,6 +80,8 @@ source_set("unittests") {
     "../internal/cwv_preview_element_info_unittest.mm",
     "../internal/cwv_ssl_error_handler_unittest.mm",
     "../internal/cwv_ssl_status_unittest.mm",
+    "../internal/cwv_userscript_metadata_unittest.mm",
+    "../internal/cwv_userscript_url_matcher_unittest.mm",
     "../internal/cwv_web_view_configuration_internal_unittest.mm",
     "../internal/cwv_web_view_unittest.mm",
     "../internal/cwv_x509_certificate_unittest.mm",
@@ -134,6 +136,7 @@ source_set("unittests") {
     "//testing/gtest",
     "//third_party/ocmock",
     "//ui/gfx:test_support",
+    "//url",
   ]
 }
 

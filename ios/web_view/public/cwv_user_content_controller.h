@@ -26,6 +26,9 @@ CWV_EXPORT
 // Adds a user script.
 - (void)addUserScript:(CWVUserScript*)userScript;
 
+// Removes an individual associated user script.
+- (void)removeUserScript:(CWVUserScript*)userScript;
+
 // Removes all associated user scripts.
 - (void)removeAllUserScripts;
 

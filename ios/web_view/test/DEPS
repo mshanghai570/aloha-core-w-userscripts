@@ -9,5 +9,6 @@ include_rules = [
   "+mojo/core/embedder",
   "+net",
   "+ui/base",
+  "+url",
   # keep-sorted end
 ]
