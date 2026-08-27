@@ -15,11 +15,14 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CWVUserscript : NSObject
 
 @property(nonatomic, copy, readonly) NSURL* fileURL;
+@property(nonatomic, copy, readonly) NSString* identifier;
 @property(nonatomic, copy, readonly) NSString* source;
 @property(nonatomic, readonly) CWVUserscriptMetadata* metadata;
+@property(nonatomic, readonly, getter=isEnabled) BOOL enabled;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (nullable instancetype)initWithFileURL:(NSURL*)fileURL
+                                 enabled:(BOOL)enabled
                                    error:(NSError* _Nullable*)error;
 
 @end

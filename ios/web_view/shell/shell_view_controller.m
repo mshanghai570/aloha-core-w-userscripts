@@ -26,7 +26,8 @@ NSString* const kWebViewShellJavaScriptDialogTextFieldAccessibilityIdentifier =
                                    CWVUIDelegate,
                                    CWVSyncControllerDelegate,
                                    UIScrollViewDelegate,
-                                   UITextFieldDelegate>
+                                   UITextFieldDelegate,
+                                   UIDocumentPickerDelegate>
 // Header containing navigation buttons and |field|.
 @property(nonatomic, strong) UIStackView* headerBackgroundView;
 // Header containing navigation buttons and |field|.
@@ -74,6 +75,15 @@ NSString* const kWebViewShellJavaScriptDialogTextFieldAccessibilityIdentifier =
 - (void)removeWebView;
 // Resets translate settings back to default.
 - (void)resetTranslateSettings;
+- (void)showUserScriptsUI;
+- (void)showUserscriptDetails:(CWVUserscript*)userscript;
+- (void)showUserscriptImportPicker;
+- (void)showUserscriptInstallConfirmationForPreview:(CWVUserscript*)preview
+                                           sourceURL:(NSURL*)sourceURL;
+- (void)showUserscriptDeleteConfirmation:(CWVUserscript*)userscript;
+- (void)showUserscriptError:(NSError*)error;
+- (void)recreateWebViewWithCurrentConfiguration;
+- (void)reloadUserscriptsAndRecreateWebView;
 @end
 
 @implementation ShellViewController
@@ -990,43 +1000,40 @@ NSString* const kWebViewShellJavaScriptDialogTextFieldAccessibilityIdentifier =
 }
 
 - (void)showUserScriptsUI {
+  CWVUserscriptManager* manager = self.webView.configuration.userscriptManager;
+  NSUInteger enabledCount = 0;
+  for (CWVUserscript* userscript in manager.userscripts) {
+    enabledCount += userscript.enabled;
+  }
+  NSString* message = [NSString
+      stringWithFormat:@"%@ installed · %@ enabled", @(manager.userscripts.count),
+                       @(enabledCount)];
   UIAlertController* alertController =
-      [self alertControllerWithTitle:@"Add or Remove User Scripts"
-                             message:@"This will also recreate the web view."
-                      preferredStyle:UIAlertControllerStyleAlert];
-
-  [alertController
-      addTextFieldWithConfigurationHandler:^(UITextField* textField) {
-        textField.placeholder = @"All frames script";
-      }];
-
-  [alertController
-      addTextFieldWithConfigurationHandler:^(UITextField* textField) {
-        textField.placeholder = @"Main frame script";
-      }];
-
-  __weak UIAlertController* weakAlertController = alertController;
+      [self actionSheetWithTitle:@"User Scripts" message:message];
   __weak ShellViewController* weakSelf = self;
   [alertController
-      addAction:[UIAlertAction
-                    actionWithTitle:@"Add"
-                              style:UIAlertActionStyleDefault
-                            handler:^(UIAlertAction* action) {
-                              NSString* allFramesSource =
-                                  weakAlertController.textFields[0].text;
-                              NSString* mainFrameSource =
-                                  weakAlertController.textFields[1].text;
-                              [weakSelf
-                                  addUserScriptForAllFrames:allFramesSource
-                                           forMainFrameOnly:mainFrameSource];
-                            }]];
-  [alertController
-      addAction:[UIAlertAction actionWithTitle:@"Remove All"
-                                         style:UIAlertActionStyleDestructive
+      addAction:[UIAlertAction actionWithTitle:@"Install Script…"
+                                         style:UIAlertActionStyleDefault
                                        handler:^(UIAlertAction* action) {
-                                         [weakSelf removeAllUserScripts];
+                                         [weakSelf showUserscriptImportPicker];
                                        }]];
-
+  for (CWVUserscript* userscript in manager.userscripts) {
+    NSString* title = [NSString
+        stringWithFormat:@"%@ · %@", userscript.metadata.name,
+                         userscript.enabled ? @"Enabled" : @"Disabled"];
+    [alertController
+        addAction:[UIAlertAction actionWithTitle:title
+                                           style:UIAlertActionStyleDefault
+                                         handler:^(UIAlertAction* action) {
+                                           [weakSelf showUserscriptDetails:userscript];
+                                         }]];
+  }
+  [alertController
+      addAction:[UIAlertAction actionWithTitle:@"Reload Installed Scripts"
+                                         style:UIAlertActionStyleDefault
+                                       handler:^(UIAlertAction* action) {
+                                         [weakSelf reloadUserscriptsAndRecreateWebView];
+                                       }]];
   [alertController
       addAction:[UIAlertAction actionWithTitle:@"Cancel"
                                          style:UIAlertActionStyleCancel
@@ -1034,31 +1041,170 @@ NSString* const kWebViewShellJavaScriptDialogTextFieldAccessibilityIdentifier =
   [self presentViewController:alertController animated:YES completion:nil];
 }
 
-- (void)addUserScriptForAllFrames:(nullable NSString*)allFramesSource
-                 forMainFrameOnly:(nullable NSString*)mainFrameSource {
+- (void)showUserscriptImportPicker {
+  UIDocumentPickerViewController* picker = [[UIDocumentPickerViewController alloc]
+      initWithDocumentTypes:@[ @"public.text" ]
+                       inMode:UIDocumentPickerModeImport];
+  picker.delegate = self;
+  picker.allowsMultipleSelection = NO;
+  [self presentViewController:picker animated:YES completion:nil];
+}
+
+- (void)documentPicker:(UIDocumentPickerViewController*)controller
+    didPickDocumentsAtURLs:(NSArray<NSURL*>*)urls {
+  NSURL* fileURL = urls.firstObject;
+  if (!fileURL) {
+    return;
+  }
+  NSError* error = nil;
+  CWVUserscript* preview =
+      [self.webView.configuration.userscriptManager previewUserscriptAtURL:fileURL
+                                                                       error:&error];
+  if (!preview) {
+    [self showUserscriptError:error];
+    return;
+  }
+  [self showUserscriptInstallConfirmationForPreview:preview sourceURL:fileURL];
+}
+
+- (void)showUserscriptInstallConfirmationForPreview:(CWVUserscript*)preview
+                                           sourceURL:(NSURL*)sourceURL {
+  NSString* includes = [preview.metadata.includePatterns componentsJoinedByString:@"\n"];
+  NSString* excludes = preview.metadata.excludePatterns.count
+                          ? [preview.metadata.excludePatterns
+                                componentsJoinedByString:@"\n"]
+                          : @"None";
+  BOOL broadAccess = [preview.metadata.includePatterns containsObject:@"<all_urls>"] ||
+                     [includes containsString:@"*://*"];
+  NSString* accessWarning = broadAccess
+                               ? @"\n\nWarning: this script can run on broadly matching sites."
+                               : @"";
+  NSString* message = [NSString
+      stringWithFormat:@"Name: %@\nRuns: %@\nMatches:\n%@\nExcludes:\n%@%@",
+                       preview.metadata.name, preview.metadata.runAt, includes,
+                       excludes, accessWarning];
+  UIAlertController* alertController =
+      [self alertControllerWithTitle:@"Install User Script?"
+                             message:message
+                      preferredStyle:UIAlertControllerStyleAlert];
+  __weak ShellViewController* weakSelf = self;
+  [alertController
+      addAction:[UIAlertAction actionWithTitle:@"Install"
+                                         style:UIAlertActionStyleDefault
+                                       handler:^(UIAlertAction* action) {
+                                         NSError* error = nil;
+                                         if (![weakSelf.webView.configuration.userscriptManager
+                                                 installUserscriptAtURL:sourceURL
+                                                                  error:&error]) {
+                                           [weakSelf showUserscriptError:error];
+                                           return;
+                                         }
+                                         [weakSelf recreateWebViewWithCurrentConfiguration];
+                                       }]];
+  [alertController
+      addAction:[UIAlertAction actionWithTitle:@"Cancel"
+                                         style:UIAlertActionStyleCancel
+                                       handler:nil]];
+  [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)showUserscriptDetails:(CWVUserscript*)userscript {
+  NSString* message = [NSString
+      stringWithFormat:@"File: %@\nStatus: %@\nRuns: %@\nMatches:\n%@\nExcludes:\n%@",
+                       userscript.identifier,
+                       userscript.enabled ? @"Enabled" : @"Disabled",
+                       userscript.metadata.runAt,
+                       [userscript.metadata.includePatterns
+                           componentsJoinedByString:@"\n"],
+                       userscript.metadata.excludePatterns.count
+                           ? [userscript.metadata.excludePatterns
+                                 componentsJoinedByString:@"\n"]
+                           : @"None"];
+  UIAlertController* alertController =
+      [self actionSheetWithTitle:userscript.metadata.name message:message];
+  __weak ShellViewController* weakSelf = self;
+  NSString* enableActionTitle = userscript.enabled ? @"Disable" : @"Enable";
+  [alertController
+      addAction:[UIAlertAction actionWithTitle:enableActionTitle
+                                         style:UIAlertActionStyleDefault
+                                       handler:^(UIAlertAction* action) {
+                                         NSError* error = nil;
+                                         if (![weakSelf.webView.configuration.userscriptManager
+                                                 setUserscriptEnabled:!userscript.enabled
+                                                        forIdentifier:userscript.identifier
+                                                                error:&error]) {
+                                           [weakSelf showUserscriptError:error];
+                                           return;
+                                         }
+                                         [weakSelf recreateWebViewWithCurrentConfiguration];
+                                       }]];
+  [alertController
+      addAction:[UIAlertAction actionWithTitle:@"Delete"
+                                         style:UIAlertActionStyleDestructive
+                                       handler:^(UIAlertAction* action) {
+                                         [weakSelf showUserscriptDeleteConfirmation:userscript];
+                                       }]];
+  [alertController
+      addAction:[UIAlertAction actionWithTitle:@"Cancel"
+                                         style:UIAlertActionStyleCancel
+                                       handler:nil]];
+  [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)showUserscriptDeleteConfirmation:(CWVUserscript*)userscript {
+  UIAlertController* alertController =
+      [self alertControllerWithTitle:@"Delete User Script?"
+                             message:userscript.metadata.name
+                      preferredStyle:UIAlertControllerStyleAlert];
+  __weak ShellViewController* weakSelf = self;
+  [alertController
+      addAction:[UIAlertAction actionWithTitle:@"Delete"
+                                         style:UIAlertActionStyleDestructive
+                                       handler:^(UIAlertAction* action) {
+                                         NSError* error = nil;
+                                         if (![weakSelf.webView.configuration.userscriptManager
+                                                 removeUserscriptWithIdentifier:userscript.identifier
+                                                                           error:&error]) {
+                                           [weakSelf showUserscriptError:error];
+                                           return;
+                                         }
+                                         [weakSelf recreateWebViewWithCurrentConfiguration];
+                                       }]];
+  [alertController
+      addAction:[UIAlertAction actionWithTitle:@"Cancel"
+                                         style:UIAlertActionStyleCancel
+                                       handler:nil]];
+  [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)recreateWebViewWithCurrentConfiguration {
   CWVWebViewConfiguration* configuration = self.webView.configuration;
   [self removeWebView];
-  if (allFramesSource.length) {
-    CWVUserScript* allFramesScript =
-        [[CWVUserScript alloc] initWithSource:allFramesSource
-                             forMainFrameOnly:NO];
-    [configuration.userContentController addUserScript:allFramesScript];
-  }
-  if (mainFrameSource.length) {
-    CWVUserScript* mainFrameScript =
-        [[CWVUserScript alloc] initWithSource:mainFrameSource
-                             forMainFrameOnly:YES];
-    [configuration.userContentController addUserScript:mainFrameScript];
-  }
   self.webView = [self createWebViewWithConfiguration:configuration];
 }
 
-- (void)removeAllUserScripts {
-  CWVWebViewConfiguration* configuration = self.webView.configuration;
-  [self removeWebView];
-  [configuration.userContentController removeAllUserScripts];
-  self.webView = [self createWebViewWithConfiguration:configuration];
+- (void)reloadUserscriptsAndRecreateWebView {
+  NSError* error = nil;
+  if (![self.webView.configuration.userscriptManager
+          reloadUserscriptsWithError:&error]) {
+    [self showUserscriptError:error];
+    return;
+  }
+  [self recreateWebViewWithCurrentConfiguration];
 }
+
+- (void)showUserscriptError:(NSError*)error {
+  UIAlertController* alertController =
+      [self alertControllerWithTitle:@"User Script Error"
+                             message:error.localizedDescription
+                      preferredStyle:UIAlertControllerStyleAlert];
+  [alertController
+      addAction:[UIAlertAction actionWithTitle:@"OK"
+                                         style:UIAlertActionStyleDefault
+                                       handler:nil]];
+  [self presentViewController:alertController animated:YES completion:nil];
+}
+
 
 - (void)resetTranslateSettings {
   CWVWebViewConfiguration* configuration =

@@ -9,10 +9,13 @@
 @implementation CWVUserscript
 
 @synthesize fileURL = _fileURL;
+@synthesize identifier = _identifier;
 @synthesize source = _source;
 @synthesize metadata = _metadata;
+@synthesize enabled = _enabled;
 
 - (nullable instancetype)initWithFileURL:(NSURL*)fileURL
+                                 enabled:(BOOL)enabled
                                    error:(NSError* _Nullable*)error {
   self = [super init];
   if (!self) {
@@ -31,7 +34,9 @@
   }
 
   _fileURL = [fileURL copy];
+  _identifier = [fileURL.lastPathComponent copy];
   _source = [source copy];
+  _enabled = enabled;
   _metadata = [[CWVUserscriptMetadata alloc]
       initWithUserscriptSource:source
                    fallbackName:fileURL.lastPathComponent];
