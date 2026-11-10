@@ -62,6 +62,7 @@
 #import "ios/chrome/browser/signin/model/authentication_service.h"
 #import "ios/chrome/browser/signin/model/authentication_service_factory.h"
 #import "ios/chrome/browser/sync/model/enterprise_utils.h"
+#import "ios/chrome/browser/userscripts/ui/userscripts_manager_view_controller.h"
 #import "ios/chrome/common/ui/colors/semantic_color_names.h"
 #import "ios/chrome/common/ui/util/constraints_ui_util.h"
 #import "ios/chrome/grit/ios_strings.h"
@@ -1217,6 +1218,18 @@ NSString* const kSettingsDoneButtonId = @"kSettingsDoneButtonId";
 
 - (void)showGeminiSettings {
   [self showGeminiSettingsPage];
+}
+
+- (void)showUserscriptsManager {
+  if ([self.topViewController
+          isKindOfClass:[UserscriptsManagerViewController class]]) {
+    return;
+  }
+  UserscriptsManagerViewController* controller =
+      [[UserscriptsManagerViewController alloc]
+          initWithProfile:self.browser->GetProfile()];
+  ConfigureHandlers(controller, _browser->GetCommandDispatcher());
+  [self pushViewController:controller animated:YES];
 }
 
 // TODO(crbug.com/41352590) : Do not pass `baseViewController` through

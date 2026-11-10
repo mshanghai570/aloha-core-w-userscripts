@@ -334,6 +334,7 @@ source_set("web_internal") {
     "//ios/chrome/browser/tracing",
     "//ios/chrome/browser/translate/model",
     "//ios/chrome/browser/unified_consent/model",
+    "//ios/chrome/browser/userscripts/model:service",
     "//ios/chrome/browser/web/model/choose_file",
     "//ios/chrome/browser/web/model/dark_mode_detection",
     "//ios/chrome/browser/web/model/font_size",

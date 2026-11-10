@@ -44,6 +44,8 @@ extern NSString* const kToolsMenuFindInPageId;
 extern NSString* const kToolsMenuRequestDesktopId;
 // Settings item accessibility Identifier.
 extern NSString* const kToolsMenuSettingsId;
+// Userscripts item accessibility Identifier.
+extern NSString* const kToolsMenuUserscriptsId;
 // Settings action item accessibility Identifier.
 extern NSString* const kToolsMenuSettingsActionId;
 // Help item accessibility Identifier.

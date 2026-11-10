@@ -76,6 +76,7 @@
 #import "ios/chrome/browser/shared/model/web_state_list/web_state_list_observer_bridge.h"
 #import "ios/chrome/browser/shared/model/web_state_list/web_state_opener.h"
 #import "ios/chrome/browser/shared/public/features/features.h"
+#import "ios/chrome/browser/shared/public/commands/settings_commands.h"
 #import "ios/chrome/browser/shared/ui/util/uikit_ui_util.h"
 #import "ios/chrome/browser/signin/model/authentication_service.h"
 #import "ios/chrome/browser/signin/model/authentication_service_factory.h"
@@ -108,6 +109,7 @@
 #import "ios/web/public/web_state_observer_bridge.h"
 #import "testing/gtest_mac.h"
 #import "testing/platform_test.h"
+#import "third_party/ocmock/OCMock/OCMock.h"
 #import "ui/base/device_form_factor.h"
 
 using sync_preferences::PrefServiceMockFactory;
@@ -1165,6 +1167,22 @@ TEST_F(OverflowMenuMediatorTest, TestNoIdentityError) {
       GetDestination(kToolsMenuSettingsId);
   ASSERT_NE(nil, settingsDestination);
   EXPECT_EQ(BadgeTypeNone, settingsDestination.badge);
+}
+
+TEST_F(OverflowMenuMediatorTest, UserscriptsDestinationOpensManagerDirectly) {
+  CreateMediator(/*incognito=*/NO);
+  id settingsHandler = OCMProtocolMock(@protocol(SettingsCommands));
+  mediator_.settingsHandler = settingsHandler;
+  mediator_.model = model_;
+
+  OverflowMenuDestination* userscriptsDestination =
+      GetDestination(kToolsMenuUserscriptsId);
+  ASSERT_NE(nil, userscriptsDestination);
+  OCMExpect([settingsHandler showUserscriptsManager]);
+
+  userscriptsDestination.handler();
+
+  OCMVerifyAll(settingsHandler);
 }
 
 // Tests that the Settings destination that has an error cue has predence over

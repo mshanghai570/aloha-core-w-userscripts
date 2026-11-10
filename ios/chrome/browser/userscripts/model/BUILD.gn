@@ -1,0 +1,80 @@
+# Copyright 2026 The Chromium Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+source_set("model") {
+  sources = [
+    "userscript.h",
+    "userscript_matcher.h",
+    "userscript_matcher.mm",
+    "userscript_parser.cc",
+    "userscript_parser.h",
+  ]
+  public_deps = [
+    "//base",
+    "//ios/web/public/js_messaging",
+  ]
+  deps = [
+    "//extensions/common",
+    "//url",
+  ]
+}
+
+source_set("prefs") {
+  sources = [
+    "userscripts_prefs.h",
+    "userscripts_prefs.mm",
+  ]
+  deps = [ "//components/pref_registry" ]
+}
+
+bundle_data("userscript_runtime") {
+  sources = [ "userscript_runtime.js" ]
+  outputs = [ "{{bundle_resources_dir}}/{{source_file_part}}" ]
+}
+
+source_set("service") {
+  sources = [
+    "userscript_store.h",
+    "userscript_store.mm",
+    "userscripts_java_script_feature.h",
+    "userscripts_java_script_feature.mm",
+    "userscripts_service.h",
+    "userscripts_service.mm",
+    "userscripts_service_factory.h",
+    "userscripts_service_factory.mm",
+  ]
+  deps = [
+    ":model",
+    ":prefs",
+    ":userscript_runtime",
+    "//components/keyed_service/core",
+    "//components/prefs",
+    "//crypto",
+    "//ios/chrome/browser/shared/model/profile",
+    "//ios/chrome/browser/shared/model/profile:profile_keyed_service_factory",
+    "//ios/web/js_messaging",
+    "//ios/web/js_messaging:java_script_feature",
+    "//ios/web/web_state/ui:wk_web_view_configuration_provider",
+    "//url",
+  ]
+}
+
+source_set("unit_tests") {
+  testonly = true
+  sources = [
+    "userscript_matcher_unittest.mm",
+    "userscript_parser_unittest.cc",
+    "userscript_store_unittest.mm",
+  ]
+  deps = [
+    ":model",
+    ":prefs",
+    ":service",
+    "//base/test:test_support",
+    "//components/prefs:test_support",
+    "//ios/web/public/js_messaging",
+    "//testing/gtest",
+    "//url",
+  ]
+}

@@ -101,3 +101,9 @@ TEST_F(OverflowMenuMetricsTest, ActionWasInitiallyVisible) {
   EXPECT_FALSE(ActionWasInitiallyVisible(overflow_menu::ActionType::ReadingList,
                                          actions, 2));
 }
+
+TEST_F(OverflowMenuMetricsTest, UserscriptsDestinationHasStableMetricValue) {
+  EXPECT_EQ(IOSOverflowMenuDestination::kUserscripts,
+            HistogramDestinationFromDestination(
+                overflow_menu::Destination::Userscripts));
+}

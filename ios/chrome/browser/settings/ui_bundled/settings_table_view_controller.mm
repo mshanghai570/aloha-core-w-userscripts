@@ -153,6 +153,7 @@
 #import "ios/chrome/browser/upgrade/model/upgrade_utils.h"
 #import "ios/chrome/browser/voice/model/speech_input_locale_config.h"
 #import "ios/chrome/browser/voice/model/voice_search_prefs.h"
+#import "ios/chrome/browser/userscripts/ui/userscripts_manager_view_controller.h"
 #import "ios/chrome/common/ui/colors/semantic_color_names.h"
 #import "ios/chrome/common/ui/table_view/table_view_cells_constants.h"
 #import "ios/chrome/grit/ios_branded_strings.h"
@@ -600,6 +601,8 @@ struct EnhancedSafeBrowsingActivePromoData
       toSectionWithIdentifier:SettingsSectionIdentifierInfo];
   [model addItem:[self contentSettingsDetailItem]
       toSectionWithIdentifier:SettingsSectionIdentifierInfo];
+  [model addItem:[self userscriptsDetailItem]
+      toSectionWithIdentifier:SettingsSectionIdentifierInfo];
   if (shouldShowDownloadsSettings) {
     [model addItem:[self downloadsSettingsDetailItem]
         toSectionWithIdentifier:SettingsSectionIdentifierInfo];
@@ -1020,6 +1023,16 @@ struct EnhancedSafeBrowsingActivePromoData
       accessibilityIdentifier:kSettingsContentSettingsCellId];
 }
 
+- (TableViewItem*)userscriptsDetailItem {
+  return [self detailItemWithType:SettingsItemTypeUserscripts
+                             text:l10n_util::GetNSString(
+                                      IDS_IOS_SETTINGS_USERSCRIPTS_TITLE)
+                       detailText:nil
+                           symbol:DefaultSettingsRootSymbol(kSettingsFilledSymbol)
+            symbolBackgroundColor:[UIColor colorNamed:kGrey400Color]
+          accessibilityIdentifier:kSettingsUserscriptsCellId];
+}
+
 - (TableViewItem*)downloadsSettingsDetailItem {
   return [self detailItemWithType:SettingsItemTypeDownloadsSettings
                              text:l10n_util::GetNSString(
@@ -1350,6 +1363,11 @@ struct EnhancedSafeBrowsingActivePromoData
     case SettingsItemTypeContentSettings:
       base::RecordAction(base::UserMetricsAction("Settings.ContentSettings"));
       [self showContentSettings];
+      break;
+    case SettingsItemTypeUserscripts:
+      base::RecordAction(base::UserMetricsAction("Settings.Userscripts.Opened"));
+      controller = [[UserscriptsManagerViewController alloc]
+          initWithProfile:_profile];
       break;
     case SettingsItemTypeDownloadsSettings:
       base::RecordAction(base::UserMetricsAction("Settings.DownloadsSettings"));

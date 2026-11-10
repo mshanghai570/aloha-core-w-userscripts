@@ -232,6 +232,7 @@ source_set("ui_bundled") {
     "//ios/chrome/browser/tabs/model/inactive_tabs:features",
     "//ios/chrome/browser/translate/model",
     "//ios/chrome/browser/upgrade/model:public",
+    "//ios/chrome/browser/userscripts/ui",
     "//ios/chrome/browser/voice/model",
     "//ios/chrome/browser/voice/model:prefs",
     "//ios/chrome/browser/web/model",

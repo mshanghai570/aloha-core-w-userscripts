@@ -34,6 +34,9 @@ enum class PushNotificationClientId;
 // Shows the Gemini settings UI.
 - (void)showGeminiSettings;
 
+// Shows the userscripts manager.
+- (void)showUserscriptsManager;
+
 // TODO(crbug.com/41352590) : Do not pass baseViewController through dispatcher.
 // Shows the Google services settings UI, presenting from `baseViewController`.
 // If `baseViewController` is nil BVC will be used as presenterViewController.

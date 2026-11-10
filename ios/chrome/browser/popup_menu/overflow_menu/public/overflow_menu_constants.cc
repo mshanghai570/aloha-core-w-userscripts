@@ -58,6 +58,10 @@ void RecordUmaActionForDestinationOnNtp(Destination destination) {
     case overflow_menu::Destination::LevelUp:
       // No need to log metrics yet.
       break;
+    case overflow_menu::Destination::Userscripts:
+      base::RecordAction(
+          base::UserMetricsAction("MobileMenuUserscriptsOnNTP"));
+      break;
   }
 }
 }  // namespace
@@ -92,6 +96,8 @@ std::optional<Destination> DestinationForStringName(std::string destination) {
     return overflow_menu::Destination::Cobalt;
   } else if (destination == "overflow_menu::Destination::LevelUp") {
     return overflow_menu::Destination::LevelUp;
+  } else if (destination == "overflow_menu::Destination::Userscripts") {
+    return overflow_menu::Destination::Userscripts;
   } else {
     return std::nullopt;
   }
@@ -129,6 +135,8 @@ std::string StringNameForDestination(Destination destination) {
       return "overflow_menu::Destination::Cobalt";
     case overflow_menu::Destination::LevelUp:
       return "overflow_menu::Destination::LevelUp";
+    case overflow_menu::Destination::Userscripts:
+      return "overflow_menu::Destination::Userscripts";
   }
 }
 // LINT.ThenChange(:stringToDestination)
@@ -288,6 +296,9 @@ void RecordUmaActionForDestination(Destination destination, bool on_ntp) {
       break;
     case overflow_menu::Destination::LevelUp:
       // No need to log metrics yet.
+      break;
+    case overflow_menu::Destination::Userscripts:
+      base::RecordAction(base::UserMetricsAction("MobileMenuUserscripts"));
       break;
   }
 }

@@ -392,6 +392,15 @@ TEST_F(SettingsTableViewControllerTest, HasDownloadsMenuItem) {
        sectionIdentifier:SettingsSectionIdentifierInfo]);
 }
 
+TEST_F(SettingsTableViewControllerTest, HasUserscriptsMenuItem) {
+  CreateController();
+  CheckController();
+
+  EXPECT_TRUE([controller().tableViewModel
+      hasItemForItemType:SettingsItemTypeUserscripts
+       sectionIdentifier:SettingsSectionIdentifierInfo]);
+}
+
 // Verifies that the default browser blue dot is displayed when indicated.
 TEST_F(SettingsTableViewControllerTest, TestHasDefaultBrowserBlueDot) {
   VerifyDefaultBrowwserBlueDot(true);

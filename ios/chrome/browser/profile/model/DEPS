@@ -104,6 +104,7 @@ specific_include_rules = {
     "+ios/chrome/browser/unified_consent/model",
     "+ios/chrome/browser/unit_conversion/model",
     "+ios/chrome/browser/visited_url_ranking/model",
+    "+ios/chrome/browser/userscripts/model/userscripts_service_factory.h",
     "+ios/chrome/browser/voice/ui_bundled",
     "+ios/chrome/browser/web/model",
     "+ios/chrome/browser/webauthn/model",

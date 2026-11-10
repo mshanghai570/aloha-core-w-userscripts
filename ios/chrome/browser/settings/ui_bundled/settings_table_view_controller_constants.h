@@ -59,7 +59,8 @@ typedef NS_ENUM(NSInteger, SettingsItemType) {
   SettingsItemTypeTabs,
   SettingsItemTypeESBPromo,
   SettingsItemTypeBWGSettings,
-  SettingsItemTypeBackendPromoDebugTools
+  SettingsItemTypeBackendPromoDebugTools,
+  SettingsItemTypeUserscripts
 };
 
 // The accessibility identifier of the settings TableView.
@@ -131,6 +132,9 @@ extern NSString* const kSettingsLanguagesCellId;
 
 // The accessibility identifier of the Content Settings cell.
 extern NSString* const kSettingsContentSettingsCellId;
+
+// The accessibility identifier of the Userscripts cell.
+extern NSString* const kSettingsUserscriptsCellId;
 
 // The accessibility identifier of the BWG Settings cell.
 extern NSString* const kSettingsBWGSettingsCellId;

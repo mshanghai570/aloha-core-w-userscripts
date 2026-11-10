@@ -76,6 +76,8 @@ specific_include_rules = {
   # TODO(crbug.com/40820398): Remove these dependencies.
   "^chrome_web_client.mm": [
     "+ios/chrome/browser/shared/ui/elements/windowed_container_view.h",
+    "+ios/chrome/browser/userscripts/model/userscripts_service.h",
+    "+ios/chrome/browser/userscripts/model/userscripts_service_factory.h",
   ],
   "^sad_tab_tab_helper.mm": [
     "+ios/chrome/browser/fullscreen/ui_bundled/fullscreen_controller.h",

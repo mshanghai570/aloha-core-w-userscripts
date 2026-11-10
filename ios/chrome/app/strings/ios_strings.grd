@@ -4269,6 +4269,63 @@ To continue from your computer, switch to <ph name="OTHER_EMAIL">$2<ex>john.doe@
       <message name="IDS_IOS_LANGUAGE_SETTINGS_TRANSLATE_SWITCH_TITLE" desc="Title for the switch to enable or disable translation in the language settings page. [Length: 30em] [iOS only]" meaning="Turning this switch on enables offering translation and turning it off disables offering translation.">
         Translate pages
       </message>
+      <message name="IDS_IOS_SETTINGS_USERSCRIPTS_TITLE" desc="Title for the userscripts manager in Settings and the toolbar menu. [iOS only]">
+        Userscripts
+      </message>
+      <message name="IDS_IOS_USERSCRIPTS_ADD_TITLE" desc="Title for adding a userscript. [iOS only]">
+        Add Userscript
+      </message>
+      <message name="IDS_IOS_USERSCRIPTS_EDIT_TITLE" desc="Title for editing a userscript. [iOS only]">
+        Edit Userscript
+      </message>
+      <message name="IDS_IOS_USERSCRIPTS_REVIEW_INSTALL" desc="Button to review userscript permissions before saving. [iOS only]">
+        Review
+      </message>
+      <message name="IDS_IOS_USERSCRIPTS_REVIEW_TITLE" desc="Title of the userscript install permission review. [iOS only]">
+        Review Userscript
+      </message>
+      <message name="IDS_IOS_USERSCRIPTS_REQUESTED_GRANTS" desc="Label preceding the permissions requested by a userscript. [iOS only]">
+        Requested permissions:
+      </message>
+      <message name="IDS_IOS_USERSCRIPTS_UNSUPPORTED_WARNING" desc="Warning that some userscript directives or permissions are not supported. [iOS only]">
+        Unsupported features (this script will not run):
+      </message>
+      <message name="IDS_IOS_USERSCRIPTS_INSTALL_ACTION" desc="Action to install or save a reviewed userscript. [iOS only]">
+        Install
+      </message>
+      <message name="IDS_IOS_USERSCRIPTS_ENTER_SOURCE" desc="Action to enter or paste userscript source. [iOS only]">
+        Enter or Paste Source
+      </message>
+      <message name="IDS_IOS_USERSCRIPTS_IMPORT_FILE" desc="Action to import a userscript source file. [iOS only]">
+        Import File
+      </message>
+      <message name="IDS_IOS_USERSCRIPTS_ENABLED" desc="Status label for an enabled userscript. [iOS only]">
+        Enabled
+      </message>
+      <message name="IDS_IOS_USERSCRIPTS_DISABLED" desc="Status label for a disabled userscript. [iOS only]">
+        Disabled
+      </message>
+      <message name="IDS_IOS_USERSCRIPTS_DELETE_TITLE" desc="Title for confirming deletion of a userscript. [iOS only]">
+        Delete Userscript?
+      </message>
+      <message name="IDS_IOS_USERSCRIPTS_DELETE_MESSAGE" desc="Message warning that deleting a userscript removes it from the browser. [iOS only]">
+        This script will be removed from this profile.
+      </message>
+      <message name="IDS_IOS_USERSCRIPTS_DELETE_ACTION" desc="Destructive action to delete a userscript. [iOS only]">
+        Delete
+      </message>
+      <message name="IDS_IOS_USERSCRIPTS_ERROR_TITLE" desc="Title for a userscript operation error. [iOS only]">
+        Userscript Error
+      </message>
+      <message name="IDS_IOS_USERSCRIPTS_INVALID_SCRIPT" desc="Error shown when a userscript header is invalid. [iOS only]">
+        The userscript header is invalid. Check that it contains a name and a complete metadata block.
+      </message>
+      <message name="IDS_IOS_USERSCRIPTS_SOURCE_TOO_LARGE" desc="Error shown when userscript source exceeds the supported size limit. [iOS only]">
+        The userscript file exceeds the 2 MiB size limit.
+      </message>
+      <message name="IDS_IOS_USERSCRIPTS_SAVE_ERROR" desc="Generic error shown when a userscript cannot be saved or imported. [iOS only]">
+        The userscript could not be saved. Check its contents and available profile storage, then try again.
+      </message>
       <message name="IDS_IOS_LENS_ALERT_CLOSE_ACTION" desc="The close button title for the Lens network connection alert [iOS only].">
         Close
       </message>

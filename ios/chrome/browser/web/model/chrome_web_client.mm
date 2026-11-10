@@ -87,6 +87,8 @@
 #import "ios/chrome/browser/supervised_user/model/supervised_user_url_filter_tab_helper.h"
 #import "ios/chrome/browser/unified_consent/model/url_keyed_data_collection_consent_helper_factory_ios.h"
 #import "ios/chrome/browser/unified_consent/model/url_keyed_data_collection_consent_helper_ios.h"
+#import "ios/chrome/browser/userscripts/model/userscripts_service.h"
+#import "ios/chrome/browser/userscripts/model/userscripts_service_factory.h"
 #import "ios/chrome/browser/web/model/browser_about_rewriter.h"
 #import "ios/chrome/browser/web/model/choose_file/choose_file_java_script_feature.h"
 #import "ios/chrome/browser/web/model/choose_file/choose_file_tab_helper.h"
@@ -399,6 +401,10 @@ std::vector<web::JavaScriptFeature*> ChromeWebClient::GetJavaScriptFeatures(
   features.push_back(PasswordProtectionJavaScriptFeature::GetInstance());
 
   ProfileIOS* profile = ProfileIOS::FromBrowserState(browser_state);
+  if (userscripts::UserscriptsService* userscripts_service =
+          userscripts::UserscriptsServiceFactory::GetForProfile(profile)) {
+    features.push_back(userscripts_service->GetJavaScriptFeature());
+  }
   JavaScriptConsoleFeature* java_script_console_feature =
       JavaScriptConsoleFeatureFactory::GetForProfile(profile);
   features.push_back(java_script_console_feature);

@@ -1181,6 +1181,28 @@ void OnListFamilyMembersResponse(
                         completion:nil];
 }
 
+- (void)showUserscriptsManager {
+  if (_settingsNavigationController) {
+    [_settingsNavigationController showUserscriptsManager];
+    return;
+  }
+
+  _settingsNavigationController =
+      [SettingsNavigationController mainSettingsControllerForBrowser:
+                                        _regularBrowser.get()
+                                                          delegate:self
+                                          hasDefaultBrowserBlueDot:NO];
+  [_settingsNavigationController showUserscriptsManager];
+
+  UIViewController* presenter = self.activeViewController;
+  while (presenter.presentedViewController) {
+    presenter = presenter.presentedViewController;
+  }
+  [presenter presentViewController:_settingsNavigationController
+                          animated:YES
+                        completion:nil];
+}
+
 // TODO(crbug.com/41352590) : Do not pass baseViewController through dispatcher.
 - (void)showGoogleServicesSettingsFromViewController:
     (UIViewController*)baseViewController {

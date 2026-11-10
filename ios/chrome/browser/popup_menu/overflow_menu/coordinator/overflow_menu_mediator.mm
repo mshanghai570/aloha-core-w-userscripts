@@ -225,6 +225,7 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
 @property(nonatomic, strong) OverflowMenuDestination* readingListDestination;
 @property(nonatomic, strong) OverflowMenuDestination* recentTabsDestination;
 @property(nonatomic, strong) OverflowMenuDestination* settingsDestination;
+@property(nonatomic, strong) OverflowMenuDestination* userscriptsDestination;
 @property(nonatomic, strong) OverflowMenuDestination* siteInfoDestination;
 @property(nonatomic, strong) OverflowMenuDestination* whatsNewDestination;
 @property(nonatomic, strong)
@@ -535,8 +536,9 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
   // Recent Tabs destination.
   self.recentTabsDestination = [self newRecentTabsDestination];
 
-  // Settings destination.
+  // Settings destinations.
   self.settingsDestination = [self newSettingsDestination];
+  self.userscriptsDestination = [self newUserscriptsDestination];
 
   self.spotlightDebuggerDestination = [self newSpotlightDebuggerDestination];
 
@@ -1184,6 +1186,21 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
   return destination;
 }
 
+- (OverflowMenuDestination*)newUserscriptsDestination {
+  __weak __typeof(self) weakSelf = self;
+  OverflowMenuDestination* destination =
+      [self createOverflowMenuDestination:IDS_IOS_SETTINGS_USERSCRIPTS_TITLE
+                              destination:overflow_menu::Destination::Userscripts
+                               symbolName:kSettingsSymbol
+                             systemSymbol:YES
+                          accessibilityID:kToolsMenuUserscriptsId
+                                  handler:^{
+                                    [weakSelf openUserscripts];
+                                  }];
+  destination.canBeHidden = NO;
+  return destination;
+}
+
 - (OverflowMenuDestination*)newWhatsNewDestination {
   __weak __typeof(self) weakSelf = self;
   return
@@ -1240,6 +1257,7 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
   switch (destination) {
     case overflow_menu::Destination::SiteInfo:
     case overflow_menu::Destination::Settings:
+    case overflow_menu::Destination::Userscripts:
     case overflow_menu::Destination::SpotlightDebugger:
     case overflow_menu::Destination::Cobalt:
       // These items are unhideable.
@@ -1483,6 +1501,7 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
       overflow_menu::Destination::RecentTabs,
       overflow_menu::Destination::SiteInfo,
       overflow_menu::Destination::Settings,
+      overflow_menu::Destination::Userscripts,
       overflow_menu::Destination::PriceNotifications,
       overflow_menu::Destination::WhatsNew,
   };
@@ -2094,6 +2113,8 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
         self.settingsDestination.badge = BadgeTypePromo;
       }
       return self.settingsDestination;
+    case overflow_menu::Destination::Userscripts:
+      return self.userscriptsDestination;
     case overflow_menu::Destination::WhatsNew:
       // Possibly set the new label badge if it was never used before.
       if (self.whatsNewDestination.badge == BadgeTypeNone &&
@@ -2161,6 +2182,8 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
       return [self newSiteInfoDestination];
     case overflow_menu::Destination::Settings:
       return [self newSettingsDestination];
+    case overflow_menu::Destination::Userscripts:
+      return [self newUserscriptsDestination];
     case overflow_menu::Destination::WhatsNew:
       return [self newWhatsNewDestination];
     case overflow_menu::Destination::SpotlightDebugger:
@@ -2705,6 +2728,11 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
                                       BadgeTypePromo)];
 }
 
+- (void)openUserscripts {
+  [self dismissMenu];
+  [self.settingsHandler showUserscriptsManager];
+}
+
 - (void)enterpriseLearnMore {
   [self dismissMenu];
   [self.sceneHandler
@@ -2744,6 +2772,7 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
     case overflow_menu::Destination::RecentTabs:
     case overflow_menu::Destination::SiteInfo:
     case overflow_menu::Destination::Settings:
+    case overflow_menu::Destination::Userscripts:
     case overflow_menu::Destination::WhatsNew:
     case overflow_menu::Destination::SpotlightDebugger:
     case overflow_menu::Destination::Cobalt:

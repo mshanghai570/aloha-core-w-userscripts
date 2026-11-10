@@ -1,0 +1,34 @@
+# Copyright 2026 The Chromium Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+bundle_data("package_load_test_data") {
+  testonly = true
+  sources = [
+    "testdata/aloha_wkwebextension_probe_malformed.zip",
+    "testdata/aloha_wkwebextension_probe_missing_manifest.zip",
+    "testdata/aloha_wkwebextension_probe_mv3.zip",
+    "testdata/aloha_wkwebextension_probe_mv3.xpi",
+    "testdata/aloha_wkwebextension_probe_valid_mv3.crx",
+  ]
+  outputs = [
+    "{{bundle_resources_dir}}/web_extensions/test/data/aloha_wkwebextension_probe_malformed.zip",
+    "{{bundle_resources_dir}}/web_extensions/test/data/aloha_wkwebextension_probe_missing_manifest.zip",
+    "{{bundle_resources_dir}}/web_extensions/test/data/aloha_wkwebextension_probe_mv3.zip",
+    "{{bundle_resources_dir}}/web_extensions/test/data/aloha_wkwebextension_probe_mv3.xpi",
+    "{{bundle_resources_dir}}/web_extensions/test/data/aloha_wkwebextension_probe_valid_mv3.crx",
+  ]
+}
+
+source_set("unit_tests") {
+  testonly = true
+  sources = [ "wk_web_extension_package_load_unittest.mm" ]
+  deps = [
+    ":package_load_test_data",
+    "//base",
+    "//base/test:test_support",
+    "//ios/third_party/webkit",
+    "//testing/gtest",
+  ]
+  frameworks = [ "WebKit.framework" ]
+}
